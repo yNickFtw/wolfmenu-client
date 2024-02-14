@@ -1,0 +1,166 @@
+.container{
+  height: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.header{
+  background-color: #202127;
+  position: sticky;
+  top: 0;
+  width: auto;
+  height: 3.125em;
+  border-bottom: 1px solid #46484F;
+  z-index: 99;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.leftHeader{
+  width: 15em;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.toggleButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5em;
+  color: #fff;
+  margin-right: 1em;
+}
+
+.toggleButton:focus {
+  outline: none;
+}
+
+.logo{
+  width: 10em;
+}
+
+.rightHeader{
+  width: 160px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+  border-left: 1px solid #46484F;
+  padding: 0 1em;
+  height: 100%;
+  
+  
+
+
+
+}
+
+.rightHeader {
+  position: relative;
+  cursor: pointer;
+}
+
+.userInfos{
+  display: flex;
+  flex-direction: column;
+}
+
+.userName{
+  font-size: 1em;
+  font-weight: 600;
+  color: #fff;
+}
+
+.userTag{
+  font-size: 0.75em;
+  color: #dc143c;
+  font-weight: 600;
+}
+
+.pic{
+  max-width: 32px;
+  min-height: 32px;
+  border-radius: 100%;
+  object-fit: cover;
+}
+
+.main{
+  background-color: #202127;
+  width: auto;
+  min-height: 100%;
+  padding: 1em;
+}
+
+.aside{
+  position: fixed;
+  top: 3.125em;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  width: 15em;
+  border-right: 1px solid #46484F;
+  background: #202127;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  transition: transform 0.3s ease;
+  transform: translateX(-15em); /* Start the sidebar off-screen */
+  z-index: 99;
+}
+
+.blur {
+  filter: blur(5px);  /* Adjust the blur amount as needed */
+  transition: all ease-in 0.3s;
+}
+
+.aside.visible {
+  transform: translateX(0);
+}
+
+.itemBox{
+  text-decoration: none;
+  height: 3em;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  padding-left: 0.6em;
+  border-left: 4px solid transparent;
+  transition: all ease .2s;
+  cursor: pointer;
+}
+
+.itemBox:hover{
+  background-color: #46484f42;
+  padding-left: 1em;
+  border-left: 4px solid #dc143c;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+}
+
+.actions button {
+  margin-top: 2em;
+  background-color: #c70d32;
+  border: none;
+  padding: .9em 2em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.actions button:hover {
+  background-color: #90031f;
+}
+
+

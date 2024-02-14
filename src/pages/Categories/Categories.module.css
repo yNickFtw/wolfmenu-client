@@ -1,0 +1,104 @@
+.main_content {
+  width: 100%;
+  margin-top: 1em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 8em;
+}
+
+.category_container {
+  width: 100%;
+  display: flex;
+  gap: 2em;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.form {
+  width: 100%;
+}
+
+.form .form_group {
+  width: 100%;
+}
+
+.form .form_group input {
+  margin: 1em 0;
+  width: 90%;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  padding: 1em 0em;
+  font-size: 1em;
+}
+
+.category_card {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  width: 250px;
+  height: auto;
+  border: 2px solid #505050;
+  border-radius: 5px;
+  padding: 1em;
+}
+
+.category_card .info_category span {
+  font-size: 1.2em;
+  font: 400;
+}
+
+.category_card .category_details p {
+  color: #b8b6b6;
+}
+
+.category_card .actions {
+  width: 100%;
+  display: flex;
+}
+
+.category_card .actions button {
+  background-color: #dc143c;
+  font-weight: 500;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 0.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  padding: 0.6em;
+  width: 100%;
+}
+
+.category_card .actions button:hover {
+  background-color: #9a122d;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.button_submit {
+  width: 100%;
+  background-color: #dc143c;
+  border: none;
+  border-radius: 5px;
+  padding: 1em;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.button_submit:hover {
+  background-color: #a40a29;
+}
+
+.button_submit:disabled {
+  cursor: not-allowed;
+  background-color: #a40a29c5;
+}
+
+@media screen and (max-width: 640px) {
+  .category_container {
+    justify-content: center;
+  }
+}

@@ -1,0 +1,46 @@
+.container_cards {
+    margin-top: 2em;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.card_dashboard {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-top: 1em;
+    width: 350px;
+    height: 150px;
+    border: 2px solid #46484f;
+    padding: 1em;
+    border-radius: 5px;
+}
+
+.header_card h3 {
+    display: flex;
+    align-items: center;
+}
+
+.separator {
+    margin: 1em 0;
+    width: 100%;
+    padding: .09em;
+    background-color: #46484f;
+}
+
+.info_card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.info_card a {
+    text-decoration: none;
+    background-color: #dc143c;
+    padding: .3em .6em;
+    border-radius: 3px;
+
+}
