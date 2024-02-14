@@ -77,6 +77,27 @@
   stroke: #a40a29;
 }
 
+.container_modal_actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.container_modal_actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: .5em;
+  background-color: #dc143c;
+  border: none;
+  border-radius: 5px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.container_modal_actions button:hover {
+  background: #a40a29;
+}
+
 @media screen and (max-width: 768px) {
   .link_card {
     width: 80vw;

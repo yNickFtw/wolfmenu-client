@@ -1,4 +1,4 @@
-import { IconDotsVertical, IconPlus } from "@tabler/icons-react";
+import { IconDotsVertical, IconPlus, IconTrash } from "@tabler/icons-react";
 import LayoutWithSidebar from "../../components/LayoutWithSidebar/LayoutWithSidebar";
 import { PrivateWithUnit } from "../../components/PrivateWithUnit/PrivateWithUnit";
 import styles from "./Links.module.css";
@@ -22,6 +22,7 @@ export const Links = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [modalCreate, setModalCreate] = useState<boolean>(false);
   const [modalActions, setModalActions] = useState<boolean>(false);
+  const [selectedLink, setSelectedLink] = useState<ILink | null>(null);
   const [title, setTitle] = useState<string>("");
   const [url, setUrl] = useState<string>("");
   const [links, setLinks] = useState<ILink[] | []>([]);
@@ -53,11 +54,13 @@ export const Links = () => {
   }, [unitSelectedId]);
 
   const handleModalActions = (link: ILink) => {
-    
+    setSelectedLink(link);
+    setModalActions(true);
   }
 
   const handleCloseModalActions = () => {
     setModalActions(false);
+    setSelectedLink(null);
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -136,16 +139,12 @@ export const Links = () => {
     );
 
     if (response.statusCode !== 200) {
-      console.log("ALL RIGHT")
-    }
-
-    if (response.statusCode === 200) {
-      toast.success(response.data.message, {
-        theme: "dark",
-      });
+      toast.error(response.data.message, {
+        theme: 'dark'
+      })
     }
   };
-
+  
   return (
     <>
       <PrivateWithUnit />
@@ -239,7 +238,11 @@ export const Links = () => {
     
     {modalActions && (
       <CustomModal subject="Ações" onClose={() => setModalActions(false)}>
-        <h2>Ações</h2>
+        <div className={styles.container_modal_actions}>
+          <button>
+            Deletar <IconTrash />
+          </button>
+        </div>
       </CustomModal>
     )}
     
