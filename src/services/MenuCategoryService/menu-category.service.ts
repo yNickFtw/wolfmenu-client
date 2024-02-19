@@ -49,4 +49,19 @@ export default class MenuCategoryService extends AppError {
             return this.appError.handleErrorResponse(error);
         }
     }
+
+    public async reorderMenuCategories(token: string, menuCategories: any[], unitId: string): Promise<IApiResponse> {
+        try {
+            const response = await api.put(`menu-categories/reorder/menu/categories/${unitId}`, menuCategories, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+
+            return { statusCode: response.status, data: response.data };
+        } catch (error: any) {
+            return this.appError.handleErrorResponse(error);
+        }
+    }
+
 }

@@ -16,6 +16,8 @@ import {
   DropResult,
   Droppable,
 } from "@hello-pangea/dnd";
+import { WolfInput } from "../../components/WolfInput/WolfInput";
+import { WolfButton } from "../../components/WolfButton/WolfButton";
 
 export const Links = () => {
   const { unitSelectedId, deleteSelectedUnit } = unitUseStore();
@@ -56,12 +58,12 @@ export const Links = () => {
   const handleModalActions = (link: ILink) => {
     setSelectedLink(link);
     setModalActions(true);
-  }
+  };
 
   const handleCloseModalActions = () => {
     setModalActions(false);
     setSelectedLink(null);
-  }
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -97,7 +99,7 @@ export const Links = () => {
     setUrl("");
   };
 
-  const reoderList = (list: ILink[], startIndex: number, endIndex: number) => {
+  const reorderList = (list: ILink[], startIndex: number, endIndex: number) => {
     const result = Array.from(list);
 
     const [removed] = result.splice(startIndex, 1);
@@ -111,7 +113,7 @@ export const Links = () => {
       return;
     }
 
-    const items = reoderList(
+    const items = reorderList(
       links,
       result.source.index,
       result.destination.index
@@ -140,11 +142,11 @@ export const Links = () => {
 
     if (response.statusCode !== 200) {
       toast.error(response.data.message, {
-        theme: 'dark'
-      })
+        theme: "dark",
+      });
     }
   };
-  
+
   return (
     <>
       <PrivateWithUnit />
@@ -189,7 +191,10 @@ export const Links = () => {
                           </div>
 
                           <div className={styles.actions_link}>
-                            <IconDotsVertical className={styles.icon_dots} onClick={() => setModalActions(true)} />
+                            <IconDotsVertical
+                              className={styles.icon_dots}
+                              onClick={() => setModalActions(true)}
+                            />
                           </div>
                         </div>
                       )}
@@ -212,40 +217,39 @@ export const Links = () => {
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.form_group}>
               <h3>Título do link:</h3>
-              <input
+              <WolfInput
                 type="text"
-                placeholder="Digite o título do link:"
+                placeholder="Título do link:"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
             <div className={styles.form_group}>
               <h3>URL:</h3>
-              <input
+              <WolfInput
                 type="text"
-                placeholder="Exemplo: https://instagram.com/nomedorestaurante:"
+                placeholder="Exemplo: https://instagram.com/nomedorestaurante"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
               />
             </div>
-            <button className={styles.button_submit} disabled={loading}>
+            <WolfButton disabled={loading}>
               {!loading && <>Criar link</>}
               {loading && <Loader2 className="animate-spin" />}
-            </button>
+            </WolfButton>
           </form>
         </CustomModal>
       )}
-    
-    {modalActions && (
-      <CustomModal subject="Ações" onClose={() => setModalActions(false)}>
-        <div className={styles.container_modal_actions}>
-          <button>
-            Deletar <IconTrash />
-          </button>
-        </div>
-      </CustomModal>
-    )}
-    
+
+      {modalActions && (
+        <CustomModal subject="Ações" onClose={() => setModalActions(false)}>
+          <div className={styles.container_modal_actions}>
+            <button>
+              Deletar <IconTrash />
+            </button>
+          </div>
+        </CustomModal>
+      )}
     </>
   );
 };

@@ -11,7 +11,7 @@ export const Successfully = () => {
     useEffect(() => {
         async function fetchLoggedUser() {
     
-        const token = localStorage.getItem("token") as string
+        const token = localStorage.getItem("token") as string;
     
         if(isLoggedIn) {
           const response = await new UserService().fetchLoggedUser(token);
@@ -26,7 +26,6 @@ export const Successfully = () => {
     
           if(response.statusCode === 200) {
             setLoggedUser(response.data);
-            console.log("Fetch com sucesso!")
           }
     
         }

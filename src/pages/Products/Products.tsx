@@ -1,4 +1,11 @@
-import { IconCaretLeft, IconCaretRight, IconEdit, IconEyeFilled, IconPlus, IconVersions } from "@tabler/icons-react";
+import {
+  IconCaretLeft,
+  IconCaretRight,
+  IconEdit,
+  IconEyeFilled,
+  IconPlus,
+  IconVersions,
+} from "@tabler/icons-react";
 import LayoutWithSidebar from "../../components/LayoutWithSidebar/LayoutWithSidebar";
 import { PrivateWithUnit } from "../../components/PrivateWithUnit/PrivateWithUnit";
 import styles from "./Products.module.css";
@@ -83,9 +90,8 @@ export const Products = () => {
                   </div>
                   <div className={styles.actions}>
                     <button className={styles.edit_product_button}>
-                      <IconEyeFilled  /> Visualizar
+                      <IconEyeFilled /> Visualizar
                     </button>
-                    
                   </div>
                 </div>
               </div>
@@ -93,17 +99,19 @@ export const Products = () => {
 
           {loading && <Loader />}
 
-          <ReactPaginate
-            previousLabel={"Anterior"}
-            nextLabel={"Próximo"}
-            breakLabel={"..."}
-            pageCount={pageCount}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={5}
-            onPageChange={handlePageClick}
-            containerClassName={"fixed-pagination"}
-            activeClassName={"active-page"}
-          />
+          {products.length > 0 && (
+            <ReactPaginate
+              previousLabel={"Anterior"}
+              nextLabel={"Próximo"}
+              breakLabel={"..."}
+              pageCount={pageCount}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={5}
+              onPageChange={handlePageClick}
+              containerClassName={"fixed-pagination"}
+              activeClassName={"active-page"}
+            />
+          )}
         </section>
       </LayoutWithSidebar>
     </>

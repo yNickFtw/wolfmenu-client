@@ -25,6 +25,7 @@
   padding: 1em;
   text-align: center;
   transition: 0.2s;
+  cursor: auto !important;
 }
 
 .link_card:hover {
@@ -37,35 +38,6 @@
 
 .form .form_group {
   width: 100%;
-}
-
-.form .form_group input {
-  margin: 1em 0;
-  width: 90%;
-  background-color: transparent;
-  border: none;
-  outline: none;
-  padding: 1em 0em;
-  font-size: 1em;
-}
-
-.button_submit {
-  width: 100%;
-  background-color: #dc143c;
-  border: none;
-  border-radius: 5px;
-  padding: 1em;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.button_submit:hover {
-  background-color: #a40a29;
-}
-
-.button_submit:disabled {
-  cursor: not-allowed;
-  background-color: #a40a29c5;
 }
 
 .icon_dots {

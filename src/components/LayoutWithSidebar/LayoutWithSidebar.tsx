@@ -19,8 +19,6 @@ const LayoutWithSidebar = ({ children }: IProps) => {
         setDesktopValue(isDesktopFunction());
       };
   
-      console.log("RESIZE")
-
       window.addEventListener("resize", handleResize);
   
       return () => {

@@ -53,6 +53,10 @@
   color: #b8b6b6;
 }
 
+.warning_no_categories {
+  margin: 2em auto;
+}
+
 .category_card .actions {
   width: 100%;
   display: flex;

@@ -12,6 +12,8 @@ import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import ProductService from "../../services/ProductService/product.service";
 import { Loader2 } from "lucide-react";
+import { CreateCategorieModal } from "../../components/CreateCategorieModal/CreateCategorieModal";
+import { NoCategoriesFoundCard } from "../../components/NoCategoriesFoundCard/NoCategoriesFoundCard";
 
 export const CreateProduct = () => {
   const [step, setStep] = useState<number>(1);
@@ -28,6 +30,7 @@ export const CreateProduct = () => {
   const [pageCount, setPageCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { unitSelectedId, deleteSelectedUnit } = unitUseStore();
+  const [modalCreate, setModalCreate] = useState<boolean>(false);
   const { logout } = useUserStore();
 
   const categoryService = new CategoryService();
@@ -62,13 +65,15 @@ export const CreateProduct = () => {
       navigate("/login");
     }
 
+    if(modalCreate) {
+      setModalCreate(false);
+    }
+
     setLoading(false);
   }
 
   useEffect(() => {
     fetchCategories();
-
-    console.log("TESTE");
   }, [currentPage]);
 
   const previousStep = () => {
@@ -161,15 +166,15 @@ export const CreateProduct = () => {
 
   const formatPrice = (inputValue: string) => {
     // Remove caracteres não numéricos
-    const numericValue = inputValue.replace(/[^0-9]/g, '');
+    const numericValue = inputValue.replace(/[^0-9]/g, "");
 
     // Converte para número
     const floatValue = parseFloat(numericValue);
 
     // Formata para milhares separados por ponto e duas casas decimais
-    const formattedValue = new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
+    const formattedValue = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
       minimumFractionDigits: 2,
     }).format(floatValue / 100);
 
@@ -182,7 +187,6 @@ export const CreateProduct = () => {
 
     setPrice(formattedValue);
   };
-
 
   return (
     <>
@@ -369,11 +373,17 @@ export const CreateProduct = () => {
                   3
                 </div>
               </div>
-              <div className={styles.to_do_section}>
-                <h3>Selecione a categoria deste produto:</h3>
-              </div>
+              {categories.length > 0 && (
+                <div className={styles.to_do_section}>
+                  <h3>Selecione a categoria deste produto:</h3>
+                </div>
+              )}
 
               <div className={styles.container_categories}>
+                {categories.length < 1 && (
+                  <NoCategoriesFoundCard handleModalCreateCategory={() => setModalCreate(!modalCreate)} />
+                )}
+
                 {categories &&
                   categories.map((category: ICategory) => (
                     <div
@@ -390,17 +400,19 @@ export const CreateProduct = () => {
               </div>
 
               <div style={{ marginTop: "2em" }}>
-                <ReactPaginate
-                  previousLabel={"Anterior"}
-                  nextLabel={"Próximo"}
-                  breakLabel={"..."}
-                  pageCount={pageCount}
-                  marginPagesDisplayed={3}
-                  pageRangeDisplayed={3}
-                  onPageChange={handlePageClick}
-                  containerClassName={"pagination-create-product"}
-                  activeClassName={"active-page"}
-                />
+                {categories.length > 0 && (
+                  <ReactPaginate
+                    previousLabel={"Anterior"}
+                    nextLabel={"Próximo"}
+                    breakLabel={"..."}
+                    pageCount={pageCount}
+                    marginPagesDisplayed={3}
+                    pageRangeDisplayed={3}
+                    onPageChange={handlePageClick}
+                    containerClassName={"pagination-create-product"}
+                    activeClassName={"active-page"}
+                  />
+                )}
               </div>
 
               <section className={styles.form}>
@@ -429,6 +441,11 @@ export const CreateProduct = () => {
           )}
         </section>
       </LayoutWithSidebar>
+
+      {modalCreate && (
+        <CreateCategorieModal handleModal={() => setModalCreate(!modalCreate)} notifyFetchCategories={() => fetchCategories()} />
+      )}
+
     </>
   );
 };

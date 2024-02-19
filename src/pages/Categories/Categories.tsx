@@ -1,7 +1,4 @@
-import {
-  IconEyeFilled,
-  IconPlus,
-} from "@tabler/icons-react";
+import { IconEyeFilled, IconPlus } from "@tabler/icons-react";
 import LayoutWithSidebar from "../../components/LayoutWithSidebar/LayoutWithSidebar";
 import { PrivateWithUnit } from "../../components/PrivateWithUnit/PrivateWithUnit";
 import styles from "./Categories.module.css";
@@ -16,6 +13,8 @@ import { useUserStore } from "../../states/user.state";
 import { useNavigate } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import { Loader } from "../../components/Loader/Loader";
+import { CreateCategorieModal } from "../../components/CreateCategorieModal/CreateCategorieModal";
+import { NoCategoriesFoundCard } from "../../components/NoCategoriesFoundCard/NoCategoriesFoundCard";
 
 export const Categories = () => {
   const [categories, setCategories] = useState<ICategory[] | []>([]);
@@ -69,60 +68,6 @@ export const Categories = () => {
     setModalCreate(!modalCreate);
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    const token = localStorage.getItem("token") as string;
-
-    const response = await new CategoryService().create(
-      token,
-      name,
-      unitSelectedId!
-    );
-
-    if (response.statusCode === 400) {
-      toast.error(response.data.message, {
-        theme: "dark",
-      });
-    }
-
-    if (response.statusCode === 401) {
-      toast.error(response.data.message, {
-        theme: "dark",
-      });
-      logout();
-      deleteSelectedUnit();
-      navigate("/login");
-    }
-
-    if (response.statusCode === 403) {
-      toast.error(response.data.message, {
-        theme: "dark",
-      });
-      deleteSelectedUnit();
-      navigate("/unities");
-    }
-
-    if (response.statusCode === 404) {
-      toast.error(response.data.message, {
-        theme: "dark",
-      });
-    }
-
-    if (response.statusCode === 201) {
-      toast.success(response.data.message, {
-        theme: "dark",
-      });
-
-      setName("");
-      setModalCreate(false);
-      fetchCategories();
-    }
-
-    setIsLoading(false);
-  };
-
   const handlePageClick = (data: any) => {
     const selectedPage = data.selected + 1;
     setCurrentPage(selectedPage);
@@ -146,6 +91,14 @@ export const Categories = () => {
         </header>
 
         <main className={styles.main_content}>
+          {categories.length < 1 && (
+            <div className={styles.warning_no_categories}>
+              <NoCategoriesFoundCard
+                handleModalCreateCategory={() => handleModalCreate()}
+              />
+            </div>
+          )}
+
           <div className={styles.category_container}>
             {!loading &&
               categories.map((category: ICategory) => (
@@ -167,45 +120,26 @@ export const Categories = () => {
 
           {loading && <Loader />}
 
-          <ReactPaginate
-            previousLabel={"Anterior"}
-            nextLabel={"Próximo"}
-            breakLabel={"..."}
-            pageCount={pageCount}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={5}
-            onPageChange={handlePageClick}
-            containerClassName={"fixed-pagination"}
-            activeClassName={"active-page"}
-          />
+          {categories.length > 0 && (
+            <ReactPaginate
+              previousLabel={"Anterior"}
+              nextLabel={"Próximo"}
+              breakLabel={"..."}
+              pageCount={pageCount}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={5}
+              onPageChange={handlePageClick}
+              containerClassName={"fixed-pagination"}
+              activeClassName={"active-page"}
+            />
+          )}
         </main>
       </LayoutWithSidebar>
       {modalCreate && (
-        <CustomModal subject="Criar categoria" onClose={handleModalCreate}>
-          <form className={styles.form} onSubmit={handleSubmit}>
-            <div className={styles.form_group}>
-              <h3>Nome da categoria:</h3>
-              <input
-                type="text"
-                placeholder="Digite o nome da categoria:"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <button
-              className={styles.button_submit}
-              disabled={!name || isLoading ? true : false}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                </>
-              ) : (
-                <>Criar categoria</>
-              )}
-            </button>
-          </form>
-        </CustomModal>
+        <CreateCategorieModal
+          handleModal={() => setModalCreate(!modalCreate)}
+          notifyFetchCategories={() => fetchCategories()}
+        />
       )}
     </>
   );

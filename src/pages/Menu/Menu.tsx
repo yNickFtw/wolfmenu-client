@@ -10,6 +10,7 @@ import { useUserStore } from "../../states/user.state";
 import { Link, useNavigate } from "react-router-dom";
 import emptyImage from "../../assets/empty.png";
 import {
+  IconAlignJustified,
   IconArrowDown,
   IconArrowUp,
   IconDots,
@@ -28,6 +29,16 @@ import { Loader } from "../../components/Loader/Loader";
 import ReactPaginate from "react-paginate";
 import ProductService from "../../services/ProductService/product.service";
 import { IProduct } from "../../helpers/interfaces/IProduct";
+import { NoCategoriesFoundCard } from "../../components/NoCategoriesFoundCard/NoCategoriesFoundCard";
+import { CreateCategorieModal } from "../../components/CreateCategorieModal/CreateCategorieModal";
+import { NoMenuCategoriesFoundCard } from "../../components/NoMenuCategoriesFoundCard/NoMenuCategoriesFoundCard";
+import {
+  DragDropContext,
+  Draggable,
+  DropResult,
+  Droppable,
+} from "@hello-pangea/dnd";
+import { IconGripVertical } from "@tabler/icons-react";
 
 interface IItemDTO {
   menu_category_id: string;
@@ -44,6 +55,11 @@ interface ILoaderPositionDTO extends IItemDTO {
   arrow: string; // "up" or "down"
 }
 
+interface IReorderMenuCategories {
+  position: number;
+  id: string;
+}
+
 export const Menu = () => {
   const [menu, setMenu] = useState<IMenu | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -57,6 +73,8 @@ export const Menu = () => {
   const [isBannerHovered, setIsBannerHovered] = useState<boolean>(false);
   const [isLoadingBanner, setIsLoadingBanner] = useState<boolean>(false);
   const [isLoadingAvatar, setIsLoadingAvatar] = useState<boolean>(false);
+  const [modalCreateCategory, setModalCreateCategory] =
+    useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [menuCategories, setMenuCategories] = useState<any[]>([]);
   const [categories, setCategories] = useState<ICategory[] | []>([]);
@@ -160,11 +178,7 @@ export const Menu = () => {
     }
 
     if (response.statusCode === 200) {
-      console.log(`MenuCategories before update:`);
-      console.log(menuCategories);
       setMenuCategories(response.data);
-      console.log(`MenuCategories after update:`);
-      console.log(menuCategories);
     }
 
     setLoading(false);
@@ -371,23 +385,23 @@ export const Menu = () => {
   };
 
   const handleSelectProduct = (id: string) => {
-    if(selectedProduct === id) {
+    if (selectedProduct === id) {
       setSelectedProduct("");
     } else {
       setSelectedProduct(id);
     }
-  }
+  };
 
   const handleSubmitMenuCategory = async () => {
     setSavingMenuCategories(true);
 
-    if(!selectedCategory) {
+    if (!selectedCategory) {
       toast.error("Selecione uma categoria para continuar", {
-        theme: "dark"
-      })
+        theme: "dark",
+      });
 
       setSavingMenuCategories(false);
-      return
+      return;
     }
 
     const response = await menuCategoryService.createMenuCategory(
@@ -422,10 +436,10 @@ export const Menu = () => {
   };
 
   const handleSubmitMenuProducts = async () => {
-    setSavingMenuProducts(true)
+    setSavingMenuProducts(true);
 
     setSavingMenuProducts(false);
-  }
+  };
 
   async function changePositionMenuCategory(
     arrow: string,
@@ -447,8 +461,6 @@ export const Menu = () => {
     }
 
     if (menuCategoryToChange) {
-      console.log(menuCategoryToChange);
-
       const response = await menuCategoryService.changePositionMenuCategory(
         token,
         menuCategoryId,
@@ -487,6 +499,58 @@ export const Menu = () => {
     }
   }
 
+  const reorderList = (list: any[], startIndex: number, endIndex: number) => {
+    const result = Array.from(list);
+
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+
+    return result;
+  };
+
+  const onDragEndCategories = async (result: DropResult) => {
+    if (!result.destination) {
+      return;
+    }
+
+    console.log(result);
+
+    const items = reorderList(
+      menuCategories,
+      result.source.index,
+      result.destination.index
+    );
+
+    setMenuCategories(items);
+
+    let orderArrayToApi: IReorderMenuCategories[] = [];
+
+    for (let i = 0; i < items.length; i++) {
+      orderArrayToApi.push({
+        id: items[i].id,
+        position: i + 1,
+      });
+    }
+
+    await callApiToChangePositions(orderArrayToApi);
+  };
+
+  const callApiToChangePositions = async (
+    menuCategories: IReorderMenuCategories[]
+  ) => {
+    const response = await menuCategoryService.reorderMenuCategories(
+      token,
+      menuCategories,
+      unitSelectedId!
+    );
+
+    if (response.statusCode !== 200) {
+      toast.error(response.data.message, {
+        theme: "dark",
+      });
+    }
+  };
+
   async function fetchProducstByCategoryId(categoryId: string) {
     setLoadingProductsCategory(true);
 
@@ -524,6 +588,26 @@ export const Menu = () => {
     await fetchProducstByCategoryId(categoryId);
   };
 
+  const handleModalCreateCategory = () => {
+    setModalCategories(!modalCategories);
+    setModalCreateCategory(!modalCreateCategory);
+  };
+
+  const handleFetchCategoriesAfterCreateOne = async () => {
+    await fetchCategories();
+    setModalCategories(true);
+  };
+
+  function truncate(source: string, size: number): string {
+    if (source.length < size) {
+      return source;
+    }
+
+    let newName = source.substring(0, size) + "...";
+
+    return newName;
+  }
+
   return (
     <>
       <PrivateWithUnit />
@@ -538,7 +622,7 @@ export const Menu = () => {
         <div className={styles.main_content}>
           {!loading && menu === null && (
             <div className={styles.card_empty}>
-              <h3>Nenhum menu...</h3>
+              <h3>Você ainda não criou um menu...</h3>
               <p>Crie seu menu agora mesmo</p>
               <img src={emptyImage} alt="Tudo vazio por aqui" />
               <button
@@ -621,159 +705,157 @@ export const Menu = () => {
                 )}
                 <div className={styles.text_unit}>
                   <h2>{unitSelected?.name}</h2>
+                  <p>{truncate(menu.description, 40)}</p>
                 </div>
               </div>
             </header>
           )}
           {!loading && menu && (
             <section className={styles.header_menu_categories}>
-              <h2>Categorias</h2>
-              <button
-                className={styles.button_create}
-                onClick={handleModalCategories}
-              >
-                Adicionar categoria
-                <IconPlus />
-              </button>
+              <div className="header_info">
+                <h2 className="pageTitle">Categorias</h2>
+                <p className="pageSubTitle">Clique e segure para trocar as posições das categorias</p>
+              </div>
+              <div className={styles.header_actions}>
+                <button
+                  className={styles.button_create}
+                  onClick={handleModalCategories}
+                >
+                  <span className={styles.desktop_text}>
+                    Adicionar categoria
+                  </span>
+                  <IconPlus />
+                </button>
+              </div>
             </section>
           )}
 
           <div className={styles.container_menu_categories}>
-            {menuCategories &&
-              menuCategories.map((menu_category: any, index: number) => (
-                <div
-                  className={styles.menu_category_card}
-                  key={menu_category.id}
-                >
-                  {menuCategories.length > 1 && (
-                    <section className={styles.position_actions}>
-                      {index !== 0 && (
-                        <>
-                          {loaderPosition.arrow === "up" &&
-                          loaderPosition.menu_category_id ===
-                            menu_category.id &&
-                          loaderPosition.status ? (
-                            <div className={styles.loader_section}>
-                              <Loader2
-                                className="animate-spin"
-                                color="crimson"
-                              />
-                            </div>
-                          ) : (
-                            <>
-                              <IconArrowUp
-                                onClick={() =>
-                                  changePositionMenuCategory(
-                                    "up",
-                                    menu_category.id,
-                                    index
-                                  )
-                                }
-                                className={styles.position_action}
-                              />
-                            </>
-                          )}
-                        </>
+            {menuCategories.length < 1 && (
+              <div className={styles.warning_menu_categories}>
+                <NoMenuCategoriesFoundCard
+                  handleModalAddMenuCategory={handleModalCategories}
+                />
+              </div>
+            )}
+
+            <DragDropContext onDragEnd={onDragEndCategories}>
+              <Droppable
+                droppableId="menu_categories"
+                type="list"
+                direction="vertical"
+              >
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    {menuCategories &&
+                      menuCategories.map(
+                        (menu_category: any, index: number) => (
+                          <>
+                            <Draggable
+                              draggableId={menu_category.id}
+                              index={index}
+                              key={menu_category.id}
+                            >
+                              {(provided) => (
+                                <div
+                                  className={styles.menu_category_card}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  ref={provided.innerRef}
+                                >
+                                  <section
+                                    className={styles.drag_and_drop_icon}
+                                  >
+                                    <IconGripVertical className={styles.icon_grab} />
+                                  </section>
+                                  <div
+                                    className={styles.separator_actions}
+                                  ></div>
+
+                                  <div className={styles.main_menu_category}>
+                                    <header
+                                      className={styles.header_menu_category}
+                                    >
+                                      <div
+                                        className={styles.menu_category_info}
+                                      >
+                                        <h2>{menu_category.category.name}</h2>
+
+                                        <h4>
+                                          {menu_category.menuProductsCount ===
+                                          0 ? (
+                                            "Categoria vazia"
+                                          ) : (
+                                            <>
+                                              {menu_category.menuProductsCount}{" "}
+                                              produtos
+                                            </>
+                                          )}
+                                        </h4>
+                                      </div>
+
+                                      <IconDots
+                                        className={styles.button_dots}
+                                        onClick={() =>
+                                          setModalActionsMenuCategory({
+                                            menu_category_id: menu_category.id,
+                                            status: true,
+                                            categoryId:
+                                              menu_category.categoryId,
+                                          })
+                                        }
+                                      />
+                                    </header>
+
+                                    <div className={styles.separator}></div>
+
+                                    <div
+                                      className={styles.actions_menu_category}
+                                    >
+                                      <button
+                                        onMouseEnter={() =>
+                                          setItemButtonHovered({
+                                            menu_category_id: menu_category.id,
+                                            status: true,
+                                            categoryId: "",
+                                          })
+                                        }
+                                        onMouseLeave={() =>
+                                          setItemButtonHovered({
+                                            menu_category_id: "",
+                                            status: false,
+                                            categoryId: "",
+                                          })
+                                        }
+                                        onClick={() =>
+                                          handleModalProductsByCategoryId(
+                                            menu_category.categoryId
+                                          )
+                                        }
+                                      >
+                                        <IconPlus
+                                          className="transition-icon"
+                                          color={
+                                            itemButtonHovered.menu_category_id ===
+                                            menu_category.id
+                                              ? "#fff"
+                                              : "#dc143c"
+                                          }
+                                        />{" "}
+                                        Adicionar item
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </Draggable>
+                          </>
+                        )
                       )}
-
-                      {index !== menuCategories.length - 1 ? (
-                        <>
-                          {loaderPosition.arrow === "down" &&
-                            loaderPosition.menu_category_id ===
-                              menu_category.id &&
-                            loaderPosition.status && (
-                              <div className={styles.loader_section}>
-                                <Loader2
-                                  className="animate-spin"
-                                  color="crimson"
-                                />
-                              </div>
-                            )}
-                          {!loaderPosition.status && (
-                            <IconArrowDown
-                              onClick={() =>
-                                changePositionMenuCategory(
-                                  "down",
-                                  menu_category.id,
-                                  index
-                                )
-                              }
-                              className={styles.position_action}
-                            />
-                          )}
-                        </>
-                      ) : (
-                        <div className={styles.position_action}></div>
-                      )}
-                    </section>
-                  )}
-                  <div className={styles.separator_actions}></div>
-
-                  <div className={styles.main_menu_category}>
-                    <header className={styles.header_menu_category}>
-                      <div className={styles.menu_category_info}>
-                        <h2>{menu_category.category.name}</h2>
-
-                        <h4>
-                          {menu_category.menuProductsCount === 0 ? (
-                            "Categoria vazia"
-                          ) : (
-                            <>{menu_category.menuProductsCount} produtos</>
-                          )}
-                        </h4>
-                      </div>
-
-                      <IconDots
-                        className={styles.button_dots}
-                        onClick={() =>
-                          setModalActionsMenuCategory({
-                            menu_category_id: menu_category.id,
-                            status: true,
-                            categoryId: menu_category.categoryId,
-                          })
-                        }
-                      />
-                    </header>
-
-                    <div className={styles.separator}></div>
-
-                    <div className={styles.actions_menu_category}>
-                      <button
-                        onMouseEnter={() =>
-                          setItemButtonHovered({
-                            menu_category_id: menu_category.id,
-                            status: true,
-                            categoryId: "",
-                          })
-                        }
-                        onMouseLeave={() =>
-                          setItemButtonHovered({
-                            menu_category_id: "",
-                            status: false,
-                            categoryId: "",
-                          })
-                        }
-                        onClick={() =>
-                          handleModalProductsByCategoryId(
-                            menu_category.categoryId
-                          )
-                        }
-                      >
-                        <IconPlus
-                          className="transition-icon"
-                          color={
-                            itemButtonHovered.menu_category_id ===
-                            menu_category.id
-                              ? "#fff"
-                              : "#dc143c"
-                          }
-                        />{" "}
-                        Adicionar item
-                      </button>
-                    </div>
                   </div>
-                </div>
-              ))}
+                )}
+              </Droppable>
+            </DragDropContext>
           </div>
         </div>
       </LayoutWithSidebar>
@@ -830,9 +912,11 @@ export const Menu = () => {
                   <h3>{product.name}</h3>
                 </div>
               ))}
-              {!loadingProductsCategory && productsCategory.length < 1 && (
-                <p className={styles.zinc_h3}>Esta categoria não tem nenhum produto cadastrado</p>
-              )}
+            {!loadingProductsCategory && productsCategory.length < 1 && (
+              <p className={styles.zinc_h3}>
+                Esta categoria não tem nenhum produto cadastrado
+              </p>
+            )}
           </div>
           {productsCategory.length > 0 && (
             <div style={{ marginTop: "2em" }}>
@@ -884,6 +968,13 @@ export const Menu = () => {
                 </div>
               ))}
           </div>
+
+          {categories.length < 1 && (
+            <NoCategoriesFoundCard
+              handleModalCreateCategory={() => handleModalCreateCategory()}
+            />
+          )}
+
           <div style={{ marginTop: "2em" }}>
             <ReactPaginate
               previousLabel={"Anterior"}
@@ -907,6 +998,13 @@ export const Menu = () => {
             </button>
           </div>
         </CustomModal>
+      )}
+
+      {modalCreateCategory && (
+        <CreateCategorieModal
+          handleModal={() => setModalCreateCategory(!modalCreateCategory)}
+          notifyFetchCategories={() => handleFetchCategoriesAfterCreateOne()}
+        />
       )}
 
       {modalEdit && (

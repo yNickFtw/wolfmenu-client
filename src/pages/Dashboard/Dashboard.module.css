@@ -19,6 +19,10 @@
     border-radius: 5px;
 }
 
+.tab_section {
+    margin: 2em auto;
+}
+
 .header_card h3 {
     display: flex;
     align-items: center;

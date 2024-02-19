@@ -62,15 +62,12 @@ export const Sidebar = ({ children }: IProps) => {
       toast.info("Selecione uma unidade antes de acessar a dashboard", {
         theme: "dark",
       });
-      console.log("TESTE 2");
       deleteSelectedUnit();
       navigate("/unities");
     }
 
     if (response.statusCode === 200) {
       setSelectedUnit(response.data);
-
-      console.log("TESTE 3");
     }
   }
 

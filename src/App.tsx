@@ -43,7 +43,6 @@ function App() {
 
         if (response.statusCode === 200) {
           setLoggedUser(response.data);
-          console.log("Fetch com sucesso!");
         }
       }
     }
