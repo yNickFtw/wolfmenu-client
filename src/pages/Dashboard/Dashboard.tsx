@@ -93,8 +93,6 @@ export const Dashboard = () => {
               </Tabs>
 
               <TabContent value="overview" activeValue={activeValue}>
-                <h3>Visão geral</h3>
-                <p>Aqui está a visão geral</p>
                 <div className={styles.container_cards}>
                   <section className={styles.card_dashboard}>
                     <div className={styles.header_card}>

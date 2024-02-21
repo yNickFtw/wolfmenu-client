@@ -1,10 +1,19 @@
 .input {
+  margin: 1em auto;
   width: 100%;
-  margin: 1em 0;
   background-color: transparent;
   border: none;
+  border-bottom: 2px solid #46484f;
   outline: none;
   padding: 1em 0em;
   font-size: 1em;
-  border-bottom: 3px solid #9b9b9b;
+  transition: 0.2s;
+}
+
+.input:hover {
+  border-bottom: 2px solid #858585;
+}
+
+.input:focus {
+  border-bottom: 2px solid #fff;
 }

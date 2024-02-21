@@ -1,8 +1,7 @@
-import { InputHTMLAttributes, ReactNode } from 'react'
+import { InputHTMLAttributes } from 'react'
 import styles from './WolfInput.module.css'
 
-interface IProps extends InputHTMLAttributes<HTMLInputElement> {
-}
+interface IProps extends InputHTMLAttributes<HTMLInputElement> {}
 
 export const WolfInput = ({ ...rest }: IProps) => {
   return (
